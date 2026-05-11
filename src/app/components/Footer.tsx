@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router';
 import { LegalModal } from '@/app/components/LegalModals';
 
 // Import logos
-import logoWhite from 'figma:asset/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
+import logoWhite from '@/assets/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
 
 interface FooterProps {
   lang: string;

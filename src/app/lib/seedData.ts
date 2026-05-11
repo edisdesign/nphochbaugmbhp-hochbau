@@ -1,12 +1,12 @@
 // Auto-seed initial projects & gallery into PocketBase when collections are empty
 import { pb, isCollectionAvailable } from './pb';
 
-import imgSunset from 'figma:asset/a8be6061aa9cf0a7aafa8fe869cbed45c59266a5.png';
-import imgCranes from 'figma:asset/7b6dd1a72da29d9c2740b676373efeea2df524b6.png';
-import imgWide from 'figma:asset/31baed233e7887515269742f5563015a26251998.png';
-import imgSteinfurt1 from 'figma:asset/4ab2a116f3334c6c36da4341b0d3c09d1c983dd0.png';
-import imgSteinfurt2 from 'figma:asset/d9f6c272323b3aaaa5158eec92210e0a4afb3c40.png';
-import imgSteinfurt3 from 'figma:asset/e1867714d93605fb053bafa74fc38d72d0dd2f9e.png';
+import imgSunset from '@/assets/a8be6061aa9cf0a7aafa8fe869cbed45c59266a5.png';
+import imgCranes from '@/assets/7b6dd1a72da29d9c2740b676373efeea2df524b6.png';
+import imgWide from '@/assets/31baed233e7887515269742f5563015a26251998.png';
+import imgSteinfurt1 from '@/assets/4ab2a116f3334c6c36da4341b0d3c09d1c983dd0.png';
+import imgSteinfurt2 from '@/assets/d9f6c272323b3aaaa5158eec92210e0a4afb3c40.png';
+import imgSteinfurt3 from '@/assets/e1867714d93605fb053bafa74fc38d72d0dd2f9e.png';
 
 interface SeedProject {
   title: string;

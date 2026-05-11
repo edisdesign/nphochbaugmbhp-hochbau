@@ -5,8 +5,8 @@ import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 // Import logos
-import logoWhite from 'figma:asset/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
-import logoBlack from 'figma:asset/a2996f8a1380f2301030d05c784c4d8a5ea4cde4.png';
+import logoWhite from '@/assets/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
+import logoBlack from '@/assets/a2996f8a1380f2301030d05c784c4d8a5ea4cde4.png';
 
 interface NavbarProps {
   lang: string;

@@ -16,7 +16,7 @@ import { toast, Toaster } from 'sonner';
 import { autoSeedIfEmpty } from '@/app/lib/seedData';
 import { isAnyCollectionAvailable } from '@/app/lib/pb';
 
-import logoWhite from 'figma:asset/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
+import logoWhite from '@/assets/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
 
 type Tab = 'projects' | 'gallery';
 

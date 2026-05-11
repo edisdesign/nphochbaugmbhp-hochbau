@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Preloader } from '@/app/components/Preloader';
 import { Toaster } from 'sonner';
 
-import exampleImage from 'figma:asset/29a5671d9dd7270c99e2c242d612819c002c4c53.png';
+import exampleImage from '@/assets/29a5671d9dd7270c99e2c242d612819c002c4c53.png';
 
 export function MainSite() {
   const [lang, setLang] = useState('DE');

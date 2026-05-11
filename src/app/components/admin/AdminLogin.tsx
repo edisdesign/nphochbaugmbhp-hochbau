@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import { Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { checkPassword, setAuth } from '@/app/lib/dataStore';
 
-import logoWhite from 'figma:asset/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
+import logoWhite from '@/assets/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
 
 export function AdminLogin() {
   const navigate = useNavigate();
