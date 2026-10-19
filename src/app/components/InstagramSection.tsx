@@ -4,6 +4,7 @@ import { MapPin } from 'lucide-react';
 import { clsx } from 'clsx';
 import { ImageWithFallback } from '@/app/components/figma/ImageWithFallback';
 import type { GalleryPhoto } from '@/app/lib/dataStore';
+import { isVideoUrl } from '@/app/lib/media';
 
 interface InstagramSectionProps {
   lang: string;
@@ -39,11 +40,14 @@ export function InstagramSection({ lang }: InstagramSectionProps) {
     setCurrent(prev => (prev + 1) % photos.length);
   }, [photos.length]);
 
+  // A video slide is not cut off by the timer: it plays to the end and then advances (onVideoEnded).
+  const currentIsVideo = isVideoUrl(photos[current]?.src);
+
   useEffect(() => {
-    if (paused || photos.length <= 1) return;
+    if (paused || photos.length <= 1 || currentIsVideo) return;
     const timer = setInterval(next, CYCLE_MS);
     return () => clearInterval(timer);
-  }, [paused, next, photos.length]);
+  }, [paused, next, photos.length, currentIsVideo]);
 
   // Reset index if photos change
   useEffect(() => {
@@ -145,6 +149,8 @@ export function InstagramSection({ lang }: InstagramSectionProps) {
                 src={photo.src}
                 alt={displayName}
                 className="w-full h-full object-cover"
+                videoLoop={photos.length <= 1}
+                onVideoEnded={next}
               />
 
               {/* Gradient overlay */}

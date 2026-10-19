@@ -12,6 +12,23 @@ import {
   type SiteProject, type GalleryPhoto
 } from '@/app/lib/dataStore';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import { MEDIA_ACCEPT, MAX_VIDEO_BYTES, isVideoFile, formatMB } from '@/app/lib/media';
+
+// Videos above 50 MB are rejected client-side (PocketBase/Cloudflare upload limit) with a hint to compress.
+function filterOversizedVideos(files: File[]): File[] {
+  const ok: File[] = [];
+  for (const f of files) {
+    if (isVideoFile(f) && f.size > MAX_VIDEO_BYTES) {
+      toast.error(`Video "${f.name}" je prevelik (${formatMB(f.size)}). Maksimum je ${formatMB(MAX_VIDEO_BYTES)}.`, {
+        description: 'Molimo kompresuj video (npr. 1080p, H.264 MP4) pa ga ponovo dodaj. / Bitte Video komprimieren (1080p, H.264 MP4).',
+        duration: 9000,
+      });
+    } else {
+      ok.push(f);
+    }
+  }
+  return ok;
+}
 import { toast, Toaster } from 'sonner';
 import { autoSeedIfEmpty } from '@/app/lib/seedData';
 import { isAnyCollectionAvailable } from '@/app/lib/pb';
@@ -175,7 +192,9 @@ export function AdminDashboard() {
 
   const handleMainImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
+    if (filterOversizedVideos([file]).length === 0) return;
     setMainImageFile(file);
     const url = URL.createObjectURL(file);
     setMainImagePreview(url);
@@ -184,7 +203,9 @@ export function AdminDashboard() {
   const handleGalleryImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-    const newFiles = Array.from(files);
+    const newFiles = filterOversizedVideos(Array.from(files));
+    e.target.value = '';
+    if (newFiles.length === 0) return;
     setGalleryFiles(prev => [...prev, ...newFiles]);
     const newPreviews = newFiles.map(f => URL.createObjectURL(f));
     setGalleryPreviews(prev => [...prev, ...newPreviews]);
@@ -310,7 +331,11 @@ export function AdminDashboard() {
   const handlePhotoFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    const newFiles = Array.from(files);
+    const newFiles = filterOversizedVideos(Array.from(files));
+    if (newFiles.length === 0) {
+      if (photoUploadRef.current) photoUploadRef.current.value = '';
+      return;
+    }
     setPhotoFiles(prev => [...prev, ...newFiles]);
     setPhotoPreviews(prev => [...prev, ...newFiles.map(f => URL.createObjectURL(f))]);
     if (photoUploadRef.current) photoUploadRef.current.value = '';
@@ -674,10 +699,10 @@ export function AdminDashboard() {
 
               {/* Main Image */}
               <div>
-                <label className="block text-white/40 text-xs uppercase tracking-widest mb-2">Glavna slika *</label>
+                <label className="block text-white/40 text-xs uppercase tracking-widest mb-2">Glavna slika / video *</label>
                 {mainImagePreview ? (
                   <div className="relative aspect-video rounded-sm overflow-hidden bg-[#111]">
-                    <ImageWithFallback src={mainImagePreview} alt="Main" className="w-full h-full object-cover" />
+                    <ImageWithFallback src={mainImagePreview} alt="Main" className="w-full h-full object-cover" isVideo={isVideoFile(mainImageFile)} />
                     <button
                       onClick={() => { setMainImagePreview(''); setMainImageFile(null); }}
                       className="absolute top-2 right-2 p-2 bg-black/70 text-white rounded-sm"
@@ -691,10 +716,10 @@ export function AdminDashboard() {
                     className="w-full aspect-video bg-[#111] border-2 border-dashed border-white/[0.08] rounded-sm flex flex-col items-center justify-center gap-2 text-white/20 active:border-[#F4B400]/30 transition-colors"
                   >
                     <Camera className="w-8 h-8" />
-                    <span className="text-xs">Dodaj sliku</span>
+                    <span className="text-xs">Dodaj sliku / video</span>
                   </button>
                 )}
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleMainImage} className="hidden" />
+                <input ref={fileInputRef} type="file" accept={MEDIA_ACCEPT} onChange={handleMainImage} className="hidden" />
               </div>
 
               {/* Title */}
@@ -827,7 +852,7 @@ export function AdminDashboard() {
                   ))}
                   {galleryPreviews.map((preview, idx) => (
                     <div key={`new-${idx}`} className="relative aspect-square rounded-sm overflow-hidden bg-[#111]">
-                      <ImageWithFallback src={preview} alt={`New ${idx}`} className="w-full h-full object-cover" />
+                      <ImageWithFallback src={preview} alt={`New ${idx}`} className="w-full h-full object-cover" isVideo={isVideoFile(galleryFiles[idx])} />
                       <div className="absolute top-1 left-1 px-1.5 py-0.5 bg-[#F4B400]/80 text-black text-[8px] rounded-sm uppercase">Novo</div>
                       <button
                         onClick={() => removeNewGalleryImage(idx)}
@@ -844,7 +869,7 @@ export function AdminDashboard() {
                     <Plus className="w-6 h-6" />
                   </button>
                 </div>
-                <input ref={galleryFileRef} type="file" accept="image/*" multiple onChange={handleGalleryImages} className="hidden" />
+                <input ref={galleryFileRef} type="file" accept={MEDIA_ACCEPT} multiple onChange={handleGalleryImages} className="hidden" />
               </div>
 
               {/* Save button */}
@@ -915,7 +940,7 @@ export function AdminDashboard() {
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {photoPreviews.map((preview, idx) => (
                     <div key={idx} className="relative aspect-square rounded-sm overflow-hidden bg-[#111]">
-                      <ImageWithFallback src={preview} alt={`Photo ${idx}`} className="w-full h-full object-cover" />
+                      <ImageWithFallback src={preview} alt={`Photo ${idx}`} className="w-full h-full object-cover" isVideo={isVideoFile(photoFiles[idx])} />
                       <button
                         onClick={() => removePhotoFile(idx)}
                         className="absolute top-1 right-1 p-1 bg-black/70 text-white rounded-sm"
@@ -935,7 +960,7 @@ export function AdminDashboard() {
                 <input
                   ref={photoUploadRef}
                   type="file"
-                  accept="image/*"
+                  accept={MEDIA_ACCEPT}
                   multiple
                   onChange={handlePhotoFilesSelect}
                   className="hidden"

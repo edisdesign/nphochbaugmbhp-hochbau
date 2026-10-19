@@ -252,11 +252,12 @@ export function ProjectsGallery({ lang, theme }: ProjectsGalleryProps) {
                                   src={allImages[activeImageIndex]} 
                                   alt={`${selectedProject.title} - ${activeImageIndex + 1}`}
                                   className="w-full h-full object-cover"
+                                  videoControls
                                 />
                               </motion.div>
                             </AnimatePresence>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:hidden" />
-                            <div className="absolute bottom-6 left-6 md:hidden">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent md:hidden pointer-events-none" />
+                            <div className="absolute bottom-6 left-6 md:hidden pointer-events-none">
                               <div className="text-[#F4B400] font-bold text-sm tracking-widest mb-1">{selectedProject.category}</div>
                               <h2 className="text-white text-4xl font-['Oswald'] font-bold uppercase">{selectedProject.title}</h2>
                             </div>
@@ -304,6 +305,7 @@ export function ProjectsGallery({ lang, theme }: ProjectsGalleryProps) {
                                       src={img} 
                                       alt={`Thumbnail ${idx + 1}`}
                                       className="w-full h-full object-cover"
+                                      videoAutoPlay={false}
                                     />
                                   </button>
                                 ))}
