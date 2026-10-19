@@ -26,16 +26,18 @@ pb.autoCancellation(false);
 //    - description_bhs (text)
 //    - main_image (file, single, required)
 //    - gallery_images (file, multiple)
-//    API Rules: List/View = "" (public), Create/Update/Delete = "" (public)
+//    API Rules: List/View = "" (public), Create/Update/Delete = @request.auth.collectionName = "site_admins"
 //
 // 2. Collection: "gallery"
 //    Fields:
 //    - image (file, single, required)
 //    - caption (text)
-//    API Rules: List/View = "" (public), Create/Update/Delete = "" (public)
+//    API Rules: List/View = "" (public), Create/Update/Delete = @request.auth.collectionName = "site_admins"
 //
-// VAŽNO: Za API Rules ostavi prazno ("") za sve operacije
-// da bi mogao pristupiti bez autentifikacije.
+// 3. Auth collection: "site_admins" (admin nalog za /admin prijavu)
+//
+// VAŽNO: Čitanje je javno, ali upis/izmjena/brisanje traže prijavu
+// kroz site_admins (pb.authStore token). Nikad ne vraćaj na "".
 // ============================================================
 
 // Track whether PB collections are available (per-collection)

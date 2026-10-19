@@ -8,7 +8,7 @@ import {
 import {
   getProjectsFromPB, addProjectToPB, deleteProjectFromPB, updateProjectInPB,
   getGalleryFromPB, addPhotoToPB, deletePhotoFromPB,
-  isAuthenticated, clearAuth, retryPBConnection,
+  isAuthenticated, refreshAuth, clearAuth, retryPBConnection,
   type SiteProject, type GalleryPhoto
 } from '@/app/lib/dataStore';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
@@ -79,7 +79,11 @@ export function AdminDashboard() {
   useEffect(() => {
     if (!isAuthenticated()) {
       navigate('/admin');
+      return;
     }
+    refreshAuth().then((ok) => {
+      if (!ok) navigate('/admin');
+    });
   }, [navigate]);
 
   // Load PocketBase data

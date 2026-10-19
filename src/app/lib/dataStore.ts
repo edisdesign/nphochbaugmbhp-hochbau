@@ -346,25 +346,50 @@ export function retryPBConnection() {
   resetPBCache();
 }
 
-// ---- AUTH (ostaje lokalno - samo šifra) ----
+// ---- AUTH (PocketBase: kolekcija "site_admins") ----
+// Upis/izmjena/brisanje u PocketBase-u dozvoljeni su samo prijavljenom
+// site_admins nalogu. Token se čuva u pb.authStore (localStorage).
 
-const AUTH_KEY = 'np_admin_auth';
-const ADMIN_PASSWORD = 'Elhamdulillah.7';
+export const ADMIN_COLLECTION = 'site_admins';
 
-export function checkPassword(password: string): boolean {
-  return password === ADMIN_PASSWORD;
-}
-
-export function setAuth() {
-  sessionStorage.setItem(AUTH_KEY, 'true');
+export async function loginAdmin(
+  email: string,
+  password: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await pb.collection(ADMIN_COLLECTION).authWithPassword(email.trim(), password);
+    return { ok: true };
+  } catch (err: any) {
+    pb.authStore.clear();
+    if (err?.status === 400 || err?.status === 401 || err?.status === 403) {
+      return { ok: false, error: 'Pogrešan email ili šifra.' };
+    }
+    return { ok: false, error: 'Prijava trenutno nije moguća. Pokušaj ponovo.' };
+  }
 }
 
 export function isAuthenticated(): boolean {
-  return sessionStorage.getItem(AUTH_KEY) === 'true';
+  const rec: any = pb.authStore.record;
+  return pb.authStore.isValid && rec?.collectionName === ADMIN_COLLECTION;
+}
+
+/** Provjeri token na serveru (npr. pri otvaranju dashboarda). */
+export async function refreshAuth(): Promise<boolean> {
+  if (!isAuthenticated()) return false;
+  try {
+    await pb.collection(ADMIN_COLLECTION).authRefresh();
+    return isAuthenticated();
+  } catch (err: any) {
+    if (err?.status === 401 || err?.status === 403 || err?.status === 404) {
+      pb.authStore.clear();
+      return false;
+    }
+    return isAuthenticated(); // mrežna greška: ostavi lokalnu sesiju
+  }
 }
 
 export function clearAuth() {
-  sessionStorage.removeItem(AUTH_KEY);
+  pb.authStore.clear();
 }
 
 // ---- FILE UTILITY ----

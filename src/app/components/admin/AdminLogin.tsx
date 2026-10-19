@@ -2,31 +2,31 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import { Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { checkPassword, setAuth } from '@/app/lib/dataStore';
+import { loginAdmin } from '@/app/lib/dataStore';
 
 import logoWhite from '@/assets/bc2e48b7921d8873d5b86d52150de03fe4507903.png';
 
 export function AdminLogin() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    setTimeout(() => {
-      if (checkPassword(password)) {
-        setAuth();
-        navigate('/admin/dashboard');
-      } else {
-        setError('Pogrešna šifra.');
-      }
-      setLoading(false);
-    }, 600);
+    const result = await loginAdmin(email, password);
+    setLoading(false);
+    if (result.ok) {
+      setPassword('');
+      navigate('/admin/dashboard');
+    } else {
+      setError(result.error || 'Pogrešan email ili šifra.');
+    }
   };
 
   return (
@@ -63,6 +63,22 @@ export function AdminLogin() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
               <label className="block text-white/40 text-xs uppercase tracking-widest mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@nphochbau.com"
+                autoComplete="username"
+                required
+                autoFocus
+                className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-sm px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F4B400]/50 transition-colors text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white/40 text-xs uppercase tracking-widest mb-2">
                 Šifra
               </label>
               <div className="relative">
@@ -71,8 +87,8 @@ export function AdminLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
+                  autoComplete="current-password"
                   required
-                  autoFocus
                   className="w-full bg-[#0A0A0A] border border-white/[0.08] rounded-sm px-4 py-3.5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#F4B400]/50 transition-colors text-sm pr-12"
                 />
                 <button
