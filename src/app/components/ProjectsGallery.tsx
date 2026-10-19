@@ -231,7 +231,7 @@ export function ProjectsGallery({ lang, theme }: ProjectsGalleryProps) {
                 </button>
 
                 {/* Left Side: Images */}
-                <div className="w-full md:w-3/5 bg-gray-100 dark:bg-black relative overflow-hidden flex flex-col">
+                <div className="w-full md:w-3/5 shrink-0 md:shrink bg-gray-100 dark:bg-black relative overflow-hidden flex flex-col">
                     {/* All images array: main + gallery */}
                     {(() => {
                       const allImages = [selectedProject.image, ...selectedProject.gallery];
